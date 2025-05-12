@@ -261,6 +261,7 @@ ZIPFILE = {
 # Variable mappings
 INDICES = {
     1991: [[0], [2]],
+    1992: [[0, 1], [2, 3]],
     1997: [[0, 1], [4, 5]],
     2012: [[0]]
 }
@@ -296,8 +297,8 @@ GENDER = YearLookupDict(GENDER)
 
 FEFAM = {
     1991: 'V1141',
-    1995: 'V1142',
-    1998: 'V2140',
+    1992: 'V2139',
+    1995: 'V2140',
     2004: 'V1143',
     2006: 'V2141',
     2009: 'V2142',
@@ -307,8 +308,8 @@ FEFAM = YearLookupDict(FEFAM)
 
 FEWORK = {
     1991: 'V1139',
-    1995: 'V1140',
-    1998: 'V2138',
+    1992: 'V2137',
+    1995: 'V2138',
     2004: 'V1141',
     2006: 'V2139',
     2009: 'V2140',
@@ -318,8 +319,8 @@ FEWORK = YearLookupDict(FEWORK)
 
 FEJOB = {
     1991: 'V1140',
-    1995: 'V1141',
-    1998: 'V2139',
+    1992: 'V2138',
+    1995: 'V2139',
     2004: 'V1142',
     2006: 'V2140',
     2009: 'V2141',
@@ -390,8 +391,9 @@ def compute_target_means(df, weighted=False):
 # Loop through all years, compute means, and collect results
 results = []
 for year in sorted(ZIPFILE.keys()):
-    df = process_year(year).query('gender == 1.0')
-    result = compute_target_means(df, weighted=False)
+    df = process_year(year, force_run=True)
+    subset = df.query('gender == 1.0').copy()
+    result = compute_target_means(subset, weighted=True)
     result['year'] = year  # Add year to result after computing means
     results.append(result)
 
