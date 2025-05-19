@@ -356,6 +356,7 @@ def process_year(year, force_run=False):
     clean_df['fefam_raw'] = df[FEFAM[year]].replace([0, 6, 9, -8, -9], np.nan)
     clean_df['fework_raw'] = df[FEWORK[year]].replace([0, 9, -8, -9], np.nan)
     clean_df['fejob_raw'] = df[FEJOB[year]].replace([0, 9, -8, -9], np.nan)
+    
     # Add weight column
     clean_df['weight'] = df[WEIGHT[year]].replace([0, 9, -9], np.nan)
 
@@ -373,9 +374,9 @@ def compute_target_means(df, weighted=False):
     Returns:
         dict: Dictionary with means for fejob, fework, and fefam
     """
-    set_target(df, 'fefam_raw', [1, 2], 'fefam')
-    set_target(df, 'fework_raw', [4, 5], 'fework')
-    set_target(df, 'fejob_raw', [4, 5], 'fejob')
+    set_target(df, 'fefam_raw', [1], 'fefam')
+    set_target(df, 'fework_raw', [5], 'fework')
+    set_target(df, 'fejob_raw', [5], 'fejob')
     
     result = {}
     if weighted:
@@ -388,14 +389,19 @@ def compute_target_means(df, weighted=False):
         result['fejob'] = df['fejob'].mean()
     return result
 
-# Loop through all years, compute means, and collect results
-results = []
-for year in sorted(ZIPFILE.keys()):
-    df = process_year(year, force_run=True)
-    subset = df.query('gender == 1.0').copy()
-    result = compute_target_means(subset, weighted=True)
-    result['year'] = year  # Add year to result after computing means
-    results.append(result)
+def main():
+    # Loop through all years, compute means, and collect results
+    results = []
+    for year in sorted(ZIPFILE.keys()):
+        df = process_year(year, force_run=True)
+        subset = df.query('gender == 1.0').copy()
+        result = compute_target_means(subset, weighted=True)
+        result['year'] = year  # Add year to result after computing means
+        results.append(result)
 
-# Create a DataFrame of the results and print
-results_df = pd.DataFrame(results).set_index('year', drop=True)
+    # Create a DataFrame of the results and print
+    results_df = pd.DataFrame(results).set_index('year', drop=True)
+    print(results_df)
+
+if __name__ == '__main__':
+    main()
